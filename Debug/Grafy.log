@@ -1,0 +1,13 @@
+﻿  Graf.cpp
+c:\users\alicja\desktop\pwr\sdzio\grafy\grafy\graf.cpp(176): warning C4018: "<": niezgodność typu ze znakiem/bez znaku
+  Queue.cpp
+c:\users\alicja\desktop\pwr\sdzio\grafy\grafy\queue.cpp(20): warning C4018: "<": niezgodność typu ze znakiem/bez znaku
+c:\users\alicja\desktop\pwr\sdzio\grafy\grafy\queue.cpp(45): warning C4018: "<": niezgodność typu ze znakiem/bez znaku
+c:\users\alicja\desktop\pwr\sdzio\grafy\grafy\queue.cpp(42): warning C4101: "j": lokalna zmienna, do której nie istnieje odwołanie
+c:\users\alicja\desktop\pwr\sdzio\grafy\grafy\queue.cpp(78): warning C4018: "<": niezgodność typu ze znakiem/bez znaku
+c:\users\alicja\desktop\pwr\sdzio\grafy\grafy\queue.cpp(110): warning C4018: "<": niezgodność typu ze znakiem/bez znaku
+c:\users\alicja\desktop\pwr\sdzio\grafy\grafy\queue.cpp(123): warning C4018: "<": niezgodność typu ze znakiem/bez znaku
+  Vertex.cpp
+  main.cpp
+  Generowanie kodu...
+  Grafy.vcxproj -> C:\Users\Alicja\Desktop\PWR\sdzio\Grafy\Debug\Grafy.exe
