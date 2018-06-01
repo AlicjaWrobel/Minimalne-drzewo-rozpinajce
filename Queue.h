@@ -25,6 +25,7 @@ public:
 	bool add(Vertex vertex); //dodaje wiercholek po sprawdzeniu czy wystapil
 	void addAppeared(Vertex vertex); // dodaje wiercholek do listy wystapien
 	Vertex removeVertex(); //usuwa element
+	Vertex lastVertex(); //ostatni element
 
 	int size(); // rozmiar kolejki krawedzi
 	void showQueue();

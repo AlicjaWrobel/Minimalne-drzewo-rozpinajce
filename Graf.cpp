@@ -146,52 +146,38 @@ void Graf::algorytmPrima()
 
 void Graf::algorytmDijkstry(int firstVertex, int lastVertex)
 {
-	vector<Edge> usedEdges; //uzyte
-	vector<Edge> notUsedEdges; //nie uzyte
-	//Vertex selectedVertex;
-	Edge selecteEdge; //aktualna krawedz
+	vector<Edge> usedEdges; // nieuzyte
+	Queue *queue = new Queue();
+	Vertex selectedVertex; //aktualny wierzcholek
 
 	for (int i = 0; i < vertices; i++) {
-
-		//usedVertices[i] = false;
-		minCost[i] = INF;
+		
+		usedVertices[i] = false;
 		preVertex[i] = -1;
+		minCost[i] = INF;
 	}
 
 	minCost[firstVertex] = 0;
 
-	for (int i = 0; i < vertices; i++) notUsedEdges.push_back(Edge(i, preVertex[i], minCost[i],0));
-
-	//selecteEdge.vertex1 = firstVertex;
-	usedEdges.push_back(Edge(0, firstVertex, 0, 0));
-	selecteEdge = usedEdges.front();
-	notUsedEdges.erase(usedEdges.begin());
-
-	while (usedEdges.size() > 0)			
-	{
-
-	}
-
-
-	/*for (int i = 0; i < vertices; i++) queue->add(Vertex(minCost[i], i, preVertex[i]));
-	
+	//for (int i = vertices-1; 0 <= i; i--) queue->add(Vertex(minCost[i], i, preVertex[i]));
+	for (int i = 0; i<vertices ; i++) queue->add(Vertex(minCost[i], i, preVertex[i]));
 	for (int x = 0; x < vertices; x++) {
-		selectedVertex.index = firstVertex;
-		//
-		selecteEdge.vertex1 = selectedVertex.index;
+		selectedVertex = queue->lastVertex();
 
 		if ((selectedVertex.value == minCost[selectedVertex.index]) && (selectedVertex.previous == preVertex[selectedVertex.index])) {
 			if (!usedVertices[selectedVertex.index]) {
 				usedVertices[selectedVertex.index] = true;
-				for (int i = 0; i < vertices; i++)
-					if (macierz[selectedVertex.index][i] != INF)
-						usedEdges.insert(usedEdges.begin() + usedEdges.size(),
-							Edge(selectedVertex.index, i, macierz[selectedVertex.index][i],0));
+
+				for (int i = 0; i < edges; i++)
+					if (macierz[selectedVertex.index][i] == 1)
+						for (int n = 0; i < edges; n++)
+							if(macierz[n][i] == -1)
+						usedEdges.insert(usedEdges.begin() + usedEdges.size(), Edge(selectedVertex.index, n, wagi[i],0));
+
 				for (int i = 0; i < usedEdges.size(); i++) {
-					if (minCost[usedEdges[i].vertex2] >(minCost[selectedVertex.index] + usedEdges[i].value)) {
+					if (minCost[usedEdges[i].vertex2] > (minCost[selectedVertex.index] + usedEdges[i].value)) {
 						minCost[usedEdges[i].vertex2] = (minCost[selectedVertex.index] + usedEdges[i].value);
 						preVertex[usedEdges[i].vertex2] = selectedVertex.index;
-						//cout << "\nDla " << usedEdges[i].node2 << " minimalny koszt dojscia to " << minimalCost[usedEdges[i].node2] << " a poprzedni wiercholek to " << previousNodes[usedEdges[i].node2];
 						queue->add(Vertex(minCost[usedEdges[i].vertex2], usedEdges[i].vertex2, selectedVertex.index));
 					}
 				}
@@ -200,7 +186,7 @@ void Graf::algorytmDijkstry(int firstVertex, int lastVertex)
 			queue->removeVertex();
 
 			if (queue->size() > 0)
-				selectedVertex.index = selecteEdge.vertex2;
+				selectedVertex = queue->lastVertex();
 			else break;
 		}
 		else {
@@ -209,7 +195,19 @@ void Graf::algorytmDijkstry(int firstVertex, int lastVertex)
 			x--;
 		}
 	
-	}*/
+	}
+
+	for (int i = 0; i < vertices; i++) {
+		int x = i;
+		cout << "\nWierzcholek " << i << ": ";
+		if (i == firstVertex) cout << "wierzcholek startowy, ";
+		else
+			while (preVertex[x] != -1) {
+				cout << preVertex[x] << " ";
+				x = preVertex[x];
+			}
+		cout << "koszt: " << minCost[i];
+	}
 
 
 }
