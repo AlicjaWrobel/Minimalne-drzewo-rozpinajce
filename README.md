@@ -1,1 +1,1 @@
-JAJO! XD
+WIADRO! XD
