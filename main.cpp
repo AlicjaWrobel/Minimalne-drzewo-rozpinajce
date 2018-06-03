@@ -4,21 +4,25 @@
 #include <fstream>
 #include "Time.h"
 #include "Edge.h"
-#include "Graf.h"
+#include "GrafMacierz.h"
+#include "GrafLista.h"
 #include "Vertex.h"
 
 using namespace std;
 
 int mst() {
 
-	static Graf* graf = nullptr;
+	static GrafMacierz* graf = nullptr;
+	static GrafLista* graf2 = nullptr;
 
 	cout <<endl<< "Wybierz operacje:\n"
 		<< "\n 1 - Wczytaj dane z pliku"
 		<< "\n 2 - Wygeneruj losowo graf"
 		<< "\n 3 - Wyœwietl graf listowo i macierzowo na ekranie"
-		<< "\n 4 - Algorytm Kruskala - macierzowo"
-		<< "\n 5 - Algorytm Prima - macierzowo"
+		<< "\n 4 - Algorytm Kruskala - macierz"
+		<< "\n 5 - Algorytm Prima - macierz"
+		<< "\n 6 - Algorytm Kruskala - lista"
+		<< "\n 7 - Algorytm Prima - lista"
 		<< "\n 0 - Powrot\n";
 
 	int wybor;
@@ -42,7 +46,8 @@ int mst() {
 			plik >> krawedzie;
 			plik >> wierzcholki;
 
-			graf = new Graf(wierzcholki, krawedzie, 0);
+			graf = new GrafMacierz(wierzcholki, krawedzie, 0);
+			graf2 = new GrafLista(wierzcholki, krawedzie,0);
 			graf->newIncidneceMatrix();
 
 			for (int i = 0; i < krawedzie; i++) {
@@ -52,8 +57,10 @@ int mst() {
 				plik >> waga;
 
 				graf->MSTincidneceMatrix(poczatek, koniec, waga, i);
+				graf2->MSTlist(poczatek, koniec, waga);
 			}
 			graf->showIncidneceMatrix();
+			graf2->Show();
 		}
 		plik.close();
 	}
@@ -68,18 +75,22 @@ int mst() {
 		int iloscKrawedziMax = wierzcholki * (wierzcholki - 1);
 		int iloscKrawedzi = (iloscKrawedziMax * gestosc) / 100;
 
-		graf = new Graf(wierzcholki, iloscKrawedzi, 0);
+		graf = new GrafMacierz(wierzcholki, iloscKrawedzi, 0);
+		graf2 = new GrafLista(wierzcholki, iloscKrawedzi, 0);
+
 		graf->newIncidneceMatrix();
 		for (int i = 0; i < iloscKrawedzi; i++) {
 
 			poczatek = rand() % wierzcholki;
 			koniec = rand() % wierzcholki;
-			waga = rand() % wierzcholki;
+			waga = rand() % 10;
 			while (koniec == poczatek) koniec = rand() % wierzcholki;
 
 			graf->MSTincidneceMatrix(poczatek, koniec, waga, i);
+			graf2->MSTlist(poczatek, koniec, waga);
 		}
 		graf->showIncidneceMatrix();
+		graf2->Show();
 
 		break;
 	}
@@ -88,6 +99,7 @@ int mst() {
 		if (graf == nullptr) cout << "Graf nie zostal wczytany \n";
 		else {
 			graf->showIncidneceMatrix();
+			graf2->Show();
 		}
 
 		break;
@@ -108,8 +120,24 @@ int mst() {
 		}
 		break;
 	}
+	case 6: {
+
+		if (graf2 == nullptr) cout << "Graf nie zostal wczytany \n";
+		else {
+			graf2->algorytmKruskala();
+		}
+		break;
+	}
+	case 7: {
+
+		if (graf2 == nullptr) cout << "Graf nie zostal wczytany \n";
+		else {
+			graf2->algorytmPrima();
+		}
+		break;
+	}
 	default:
-		cout << "\n Podaj wartosc od 0 do 5";
+		cout << "\n Podaj wartosc od 0 do 7";
 		_getch();
 		return 1;
 	}
@@ -118,14 +146,17 @@ int mst() {
 
 int sciezka() {
 
-	static Graf* graf = nullptr;
+	static GrafMacierz* graf = nullptr;
+	static GrafLista* graf2 = nullptr;
 
-	cout << "Wybierz operacje:\n"
+	cout <<endl<< "Wybierz operacje:\n"
 		<< "\n 1 - Wczytaj dane z pliku"
 		<< "\n 2 - Wygeneruj losowo graf"
 		<< "\n 3 - Wyœwietl graf listowo i macierzowo na ekranie"
-		<< "\n 4 - Algorytm Dijkstry - macierzowo"
-		<< "\n 5 - Algorytm 2"
+		<< "\n 4 - Algorytm Dijkstry - macierz"
+		<< "\n 5 - Algorytm Forda Bellamana - macierz"
+		<< "\n 6 - Algorytm Dijkstry - lista"
+		<< "\n 7 - Algorytm Forda Bellamana - lista"
 		<< "\n 0 - Powrot \n";
 
 	int wybor;
@@ -150,7 +181,8 @@ int sciezka() {
 			plik >> krawedzie;
 			plik >> wierzcholki;
 
-			graf = new Graf(wierzcholki, krawedzie, 0);
+			graf = new GrafMacierz(wierzcholki, krawedzie, 0);
+			graf2 = new GrafLista(wierzcholki, krawedzie, 0);
 			graf->newIncidneceMatrix();
 
 			for (int i = 0; i < krawedzie; i++) {
@@ -160,8 +192,10 @@ int sciezka() {
 				plik >> waga;
 
 				graf->SCIEZKAincidneceMatrix(poczatek, koniec, waga, i);
+				graf2->SCIEZKAlist(poczatek, koniec, waga);
 			}
 			graf->showIncidneceMatrix();
+			graf2->Show();
 		}
 		plik.close();
 		break;
@@ -177,21 +211,22 @@ int sciezka() {
 		int iloscKrawedziMax = wierzcholki * (wierzcholki - 1);
 		int iloscKrawedzi = (iloscKrawedziMax * gestosc) / 100;
 
-		graf = new Graf(wierzcholki, iloscKrawedzi, 0);
+		graf = new GrafMacierz(wierzcholki, iloscKrawedzi, 0);
+		graf2 = new GrafLista(wierzcholki, iloscKrawedzi, 0);
 		graf->newIncidneceMatrix();
-		//graf->newList();
+
 		for (int i = 0; i < iloscKrawedzi; i++) {
 
 			poczatek = rand() % wierzcholki;
 			koniec = rand() % wierzcholki;
-			waga = 0;
+			waga = rand() % 10;
 			while (koniec == poczatek) koniec = rand() % wierzcholki;
 
 			graf->SCIEZKAincidneceMatrix(poczatek, koniec, waga, i);
-			//graf->SCIEZKAlista(poczatek, koniec, waga, i);
+			graf2->SCIEZKAlist(poczatek, koniec, waga);
 		}
 		graf->showIncidneceMatrix();
-		//graf->showList();
+		graf2->Show();
 		break;
 	}
 		
@@ -199,6 +234,7 @@ int sciezka() {
 		if (graf == nullptr) cout << "Graf nie zostal wczytany \n";
 		else {
 			graf->showIncidneceMatrix();
+			graf2->Show();
 		}
 		break;
 	}
@@ -211,6 +247,47 @@ int sciezka() {
 			cin >> lastVertex;
 
 			graf->algorytmDijkstry(firstVertex, lastVertex);
+
+		}
+		break;
+	}
+	case 5: {
+		if (graf == nullptr) cout << "Graf nie zostal wczytany \n";
+		else {
+	
+			cout << "\n Podaj wierzcholek poczatkowy \n";
+			cin >> firstVertex;
+			cout << "\n Podaj wierzcholek koncowy \n";
+			cin >> lastVertex;
+
+				graf->algorytmFordaBellmana(firstVertex, lastVertex);
+			
+		}
+		break;
+	}
+	case 6: {
+
+		if (graf2 == nullptr) cout << "Graf nie zostal wczytany \n";
+		else {
+			cout << "\n Podaj wierzcholek poczatkowy \n";
+			cin >> firstVertex;
+			cout << "\n Podaj wierzcholek koncowy \n";
+			cin >> lastVertex;
+
+			graf2->algorytmFordaBellmana(firstVertex, lastVertex);
+		}
+		break;
+	}
+	case 7: {
+
+		if (graf2 == nullptr) cout << "Graf nie zostal wczytany \n";
+		else {
+			cout << "\n Podaj wierzcholek poczatkowy \n";
+			cin >> firstVertex;
+			cout << "\n Podaj wierzcholek koncowy \n";
+			cin >> lastVertex;
+
+			graf2->algorytmFordaBellmana(firstVertex, lastVertex);
 		}
 		break;
 	}
@@ -222,7 +299,7 @@ int sciezka() {
 	return 1;
 }
 int menu() {
-	static Graf* graf = nullptr;
+	static GrafMacierz* graf = nullptr;
 
 	cout << "Wybierz operacje:\n"
 		<< "\n 1 - Budowanie minimalnego drzewa rozpinajacego"

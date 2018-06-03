@@ -116,7 +116,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Edge.cpp" />
-    <ClCompile Include="Graf.cpp" />
+    <ClCompile Include="GrafMacierz.cpp" />
+    <ClCompile Include="GrafLista.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Queue.cpp" />
     <ClCompile Include="Time.cpp" />
@@ -125,7 +126,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Edge.h" />
-    <ClInclude Include="Graf.h" />
+    <ClInclude Include="GrafMacierz.h" />
+    <ClInclude Include="GrafLista.h" />
     <ClInclude Include="Queue.h" />
     <ClInclude Include="Time.h" />
     <ClInclude Include="Tree.h" />
