@@ -93,10 +93,8 @@ void Queue::addAppeared(Vertex vertex)
 Vertex Queue::removeVertex()
 {
 	Vertex last;
-
-	last = tab2.back(); //referencja na ostatni element
-	tab2.pop_back();
-
+	last = tab2.front(); //referencja na ostatni element
+	tab2.erase(tab2.begin());
 	return last;
 }
 
@@ -107,6 +105,11 @@ Vertex Queue::lastVertex()
 	last = tab2.back(); //referencja na ostatni element
 
 	return last;
+}
+
+Vertex Queue::getFirst()
+{
+	return tab2.front();
 }
 
 

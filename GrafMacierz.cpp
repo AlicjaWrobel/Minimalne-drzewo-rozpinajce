@@ -3,23 +3,19 @@
 #include <iomanip>
 #include "Queue.h"
 #include "Tree.h"
+#include <queue>
 
-#define INF 10000 //definicja 'nieskonczonosci'
+#define INF 1000000 //definicja 'nieskonczonosci'
 
 using namespace std;
 
-GrafMacierz::GrafMacierz(int vertices, int edges, int start_vertices)
+GrafMacierz::GrafMacierz(int vertices, int edges)
 {
 	this->edges = edges;
 	this->vertices = vertices;
-	this->start_vertices = start_vertices;
 
 	macierz = new int*[vertices];
 	wagi = new int[edges];
-
-	usedVertices = new bool[vertices];
-	minCost = new int[vertices];
-	preVertex = new int[vertices];
 
 }
 
@@ -82,7 +78,7 @@ void GrafMacierz::algorytmKruskala() {
 
 					if (macierz[n][i] == 1) {
 
-						queue->add(Edge(j, n, wagi[i], 0));
+						queue->add(Edge(j, n, wagi[i],0));
 						n = vertices;
 					}
 
@@ -101,6 +97,10 @@ void GrafMacierz::algorytmKruskala() {
 	}
 	cout << endl << "suma wag:" << endl;
 	cout << tree->sumValues() << endl;
+
+	delete queue;
+	delete tree;
+
 }
 
 void GrafMacierz::algorytmPrima()
@@ -125,7 +125,7 @@ void GrafMacierz::algorytmPrima()
 					}
 					if (macierz[n][j] == 1) {
 
-						queue->add(Edge(i, n, wagi[j], 0));
+						queue->add(Edge(i, n, wagi[j],0));
 						n = vertices;
 					}
 
@@ -142,15 +142,19 @@ void GrafMacierz::algorytmPrima()
 
 	cout << endl << "suma wag:" << endl;
 	cout << tree->sumValues() << endl;
+
+	delete queue;
+	delete tree;
 }
+
 
 void GrafMacierz::algorytmDijkstry(int firstVertex, int lastVertex)
 {
 
-	vector<Edge> Edges; // nieuzyte
+	vector<Edge> Edges(vertices); // nieuzyte
 	int *UsedEdges = new int[vertices]; //uzyte
 	Edge selectedEdge; //aktualna krawedz
-	
+
 	selectedEdge.value = INF;
 
 	for (int i = 0; i < vertices; i++) {
@@ -165,23 +169,23 @@ void GrafMacierz::algorytmDijkstry(int firstVertex, int lastVertex)
 
 	while (Edges.size() > 0)
 	{
-		int cost = 0;
+		int cost;
 		int startCost;
 		int index;
 		Edge wsk;
 
 		for (int i = 0; i < Edges.size(); i++)
-		for (int j = 0; j<Edges.size() - 1; j++)
-		{
-			if (Edges[j].value > Edges[j + 1].value)
+			for (int j = 0; j<Edges.size() - 1; j++)
 			{
-				wsk = Edges[j];
-				Edges[j] = Edges[j + 1];
-				Edges[j + 1] = wsk;
+				if (Edges[j].value > Edges[j + 1].value)
+				{
+					wsk = Edges[j];
+					Edges[j] = Edges[j + 1];
+					Edges[j + 1] = wsk;
+				}
 			}
-		}
 
-		selectedEdge = Edges.front();
+		selectedEdge = Edges[0];
 		Edges.erase(Edges.begin());
 		index = selectedEdge.vertex2;
 		startCost = selectedEdge.value;
@@ -194,23 +198,26 @@ void GrafMacierz::algorytmDijkstry(int firstVertex, int lastVertex)
 
 					if (macierz[n][j] == -1) {
 
-						selectedEdge = Edge(0, n, wagi[j], 0);
+						selectedEdge = Edge(0, n, wagi[j],0);
 						cost = selectedEdge.value + startCost;
 
-						int i;
-						bool check = 1;
-						if (check == 1) {
-							for (i = 0; i < Edges.size(); i++)
+						int i = 0;
+							for (int z = 0; z<Edges.size(); z++)
 							{
-								if (Edges[i].value == selectedEdge.vertex2)
-									check = 0;
+								if (Edges[z].vertex2 == selectedEdge.vertex2) {
+									i = z;
+									z = Edges.size();
+								}
+								else {
+									i = -1;
+								}
 							}
-						}
 
-						if (Edges[i].value > cost)		// Macierz incydencji spisuje sie tu
-						{														// bardzo slabo, o wiele lepiej w tym 			
-							selectedEdge.value = cost;					// przypadku bedzie dzialac lista
-							Edges[i] = selectedEdge;		// sasiedztwa
+						if(i >=0 && Edges.size() != 0)
+						if (Edges[i].value > cost)
+						{
+							selectedEdge.value = cost;
+							Edges[i] = selectedEdge;
 						}
 
 						n = vertices;
@@ -221,20 +228,13 @@ void GrafMacierz::algorytmDijkstry(int firstVertex, int lastVertex)
 			}
 		}
 
-		//queue->sortHeap();
-		//selectedEdge = queue->removeEdge(); //wybiera najelpsza sciezke
-		//usedEdges.push_back(selectedEdge); //dodaje
-		//notUsedEdges.pop_back();
-
-		//selecteEdge = usedEdges.back();
-
 	}
 
-	cout << "\n\n--- ALGORYTM DIJKSTRY ---\n";
-	cout << endl << "Najkrotsze sciezki miedzy wierzcholkami : " << endl;
-	for (int i = 0; i<vertices; i++)
+	cout << endl << "ALGORYTM DIJKSTRY" << endl;
+	cout << endl << "Najkrotsze sciezki: " << endl;
+	for (int i = 0; i < vertices; i++)
 	{
-		cout << setw(3) << i << "|";
+		cout << setw(3) << firstVertex << "-" << i << ":";
 		if (UsedEdges[i] == 1000000)
 		{
 			cout << setw(3) << "*" << endl;
@@ -244,74 +244,15 @@ void GrafMacierz::algorytmDijkstry(int firstVertex, int lastVertex)
 			cout << setw(3) << UsedEdges[i] << endl;
 		}
 	}
-	cout << endl << "Najkrotsza sciezka w grafie pomiedzy: " << firstVertex << "-"
-		<< UsedEdges << " wynosi:  ---" << UsedEdges[lastVertex] << "---";
+
+	if (lastVertex>vertices-1) {
+		cout << endl << "Dany wierzcholek nie istnieje" << endl;
+	}
+	else {
+		cout << endl << "Najkrotsza sciezka pomiedzy wierzcholkiem startowym, a koncowym " << endl << firstVertex << "-"
+			<< lastVertex << ": " << UsedEdges[lastVertex] << endl;
+	}
 	delete[]UsedEdges;
-
-	/*vector<Edge> usedEdges; // nieuzyte
-	Queue *queue = new Queue();
-	Vertex selectedVertex; //aktualny wierzcholek
-
-	for (int i = 0; i < vertices; i++) {
-
-		usedVertices[i] = false;
-		preVertex[i] = -1;
-		minCost[i] = INF;
-	}
-
-	minCost[firstVertex] = 0;
-
-	//for (int i = vertices-1; 0 <= i; i--) queue->add(Vertex(minCost[i], i, preVertex[i]));
-	for (int i = 0; i < vertices; i++) queue->add(Vertex(minCost[i], i, preVertex[i]));
-	for (int x = 0; x < vertices; x++) {
-		selectedVertex = queue->lastVertex();
-
-		if ((selectedVertex.value == minCost[selectedVertex.index]) && (selectedVertex.previous == preVertex[selectedVertex.index])) {
-			if (!usedVertices[selectedVertex.index]) {
-				usedVertices[selectedVertex.index] = true;
-
-				for (int i = 0; i < edges; i++)
-					if (macierz[selectedVertex.index][i] == 1)
-						for (int n = 0; i < edges; n++)
-							if (macierz[n][i] == -1)
-								usedEdges.insert(usedEdges.begin() + usedEdges.size(), Edge(selectedVertex.index, n, wagi[i], 0));
-
-				for (int i = 0; i < usedEdges.size(); i++) {
-					if (minCost[usedEdges[i].vertex2] > (minCost[selectedVertex.index] + usedEdges[i].value)) {
-						minCost[usedEdges[i].vertex2] = (minCost[selectedVertex.index] + usedEdges[i].value);
-						preVertex[usedEdges[i].vertex2] = selectedVertex.index;
-						queue->add(Vertex(minCost[usedEdges[i].vertex2], usedEdges[i].vertex2, selectedVertex.index));
-					}
-				}
-				usedEdges.clear();
-			}
-			queue->removeVertex();
-
-			if (queue->size() > 0)
-				selectedVertex = queue->lastVertex();
-			else break;
-		}
-		else {
-			queue->removeVertex();
-			queue->add(Vertex(minCost[selectedVertex.index], selectedVertex.index, preVertex[selectedVertex.index]));
-			x--;
-		}
-
-	}
-
-	for (int i = 0; i < vertices; i++) {
-		int x = i;
-		cout << "\nWierzcholek " << i << ": ";
-		if (i == firstVertex) cout << "wierzcholek startowy, ";
-		else
-			while (preVertex[x] != -1) {
-				cout << preVertex[x] << " ";
-				x = preVertex[x];
-			}
-		cout << "koszt: " << minCost[i];
-	}*/
-
-
 }
 
 void GrafMacierz::algorytmFordaBellmana(int firstVertex, int lastVertex)
@@ -336,7 +277,7 @@ void GrafMacierz::algorytmFordaBellmana(int firstVertex, int lastVertex)
 					{
 						if (macierz[k][j] == -1)
 						{
-							edge = Edge(p, k, wagi[j], 0);
+							edge = Edge(p, k, wagi[j],0);
 
 							if (tab[edge.vertex2] > tab[edge.vertex1] + edge.value)		// jezeli dlugosc sciezki krotszej jest wieksza niz dlugosc sciezki po wiekszej ilosci krawedzi
 							{
@@ -365,8 +306,13 @@ void GrafMacierz::algorytmFordaBellmana(int firstVertex, int lastVertex)
 		}
 	}
 
-	cout << endl << "Najkrotsza sciezka pomiedzy wierzcholkiem startowym, a koncowym " <<endl<< firstVertex << "-"
-		<< lastVertex << ": " << tab[lastVertex] << endl;
+	if (lastVertex>vertices - 1) {
+		cout << endl << "Dany wierzcholek nie istnieje" << endl;
+	}
+	else {
+		cout << endl << "Najkrotsza sciezka pomiedzy wierzcholkiem startowym, a koncowym " << endl << firstVertex << "-"
+			<< lastVertex << ": " << tab[lastVertex] << endl;
+	}
 
 	delete[]tab;
 
@@ -380,9 +326,5 @@ GrafMacierz::~GrafMacierz()
 
 	delete[] macierz;
 	delete[] wagi;
-
-	delete[]usedVertices;
-	delete[]minCost;
-	delete[]preVertex;
 
 }

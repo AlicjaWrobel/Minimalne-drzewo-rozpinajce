@@ -12,22 +12,20 @@ class GrafLista
 private:
 	Vertex vertex; //wierzcholek
 
-	int edges;
-	int vertices;
-	int start_vertices;
+	int edges; //ilosc krawedzi
+	int vertices; //ilosc wierzcholkow
 	int cost;	//koszt
-	int firstVertex, lastVertex;
+	int firstVertex, lastVertex;  // wierzcholki podane na wejsciu potrzebne przy wznaczaniu najkrotszej sciezki
+
 
 public:
-	//int * wagi;
-	//int ** lista;
-	list<Edge> list;
-	GrafLista(int vertices, int edges, int start_vertices);
+	list<Edge> list; //lista wierzcholkow
+	GrafLista(int vertices, int edges);
 	~GrafLista();
 
-	void MSTlist(int poczatek, int koniec, int waga);
-	void SCIEZKAlist(int poczatek, int koniec, int waga);
-	void Show();
+	void MSTlist(int poczatek, int koniec, int waga); //lista dla MST
+	void SCIEZKAlist(int poczatek, int koniec, int waga); //lista dla sciezki
+	void Show(); //wyswietlenie listy
 
 	void algorytmKruskala();
 	void algorytmPrima();

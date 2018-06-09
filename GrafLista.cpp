@@ -3,20 +3,17 @@
 #include <iomanip>
 #include "Queue.h"
 #include "Tree.h"
+#include <queue>
 
 
-#define INF 10000 //definicja 'nieskonczonosci'
+#define INF 1000000 //definicja 'nieskonczonosci'
 
 
-GrafLista::GrafLista(int vertices, int edges, int start_vertices)
+GrafLista::GrafLista(int vertices, int edges)
 {
 	this->edges = edges;
 	this->vertices = vertices;
-	this->start_vertices = start_vertices;
 
-	//wagi = new int[edges];
-	//lista= new int*[edges];
-	//for (int i = 0; i < edges; i++) lista[i] = new int[3];
 }
 
 void GrafLista::MSTlist(int poczatek, int koniec, int waga) {
@@ -45,15 +42,22 @@ void GrafLista::SCIEZKAlist(int poczatek, int koniec, int waga) {
 	list.push_back(edge);
 }
 
-
 void GrafLista::Show()
 {
 	cout << endl << "Lista sasiedztwa grafu: " << endl;
+	std::vector<std::list<Edge>> listGraph2(vertices);
 
 	for (std::list<Edge>::iterator i = list.begin(); i != list.end(); ++i) {
-		cout << i->vertex1 << "-" << i->vertex2 << ": " << i->value << endl;
+		listGraph2[i->vertex1].push_back(Edge(i->vertex1, i->vertex2, i->value, 0));
 	}
 
+	for (int i = 0; i < vertices; i++) {
+		cout << "\nWiercholek " << i << ": ";
+		for (std::list<Edge>::iterator iter = listGraph2[i].begin(); iter != listGraph2[i].end(); ++iter) {
+			cout << "->" << iter->vertex2 << ":" << iter->value << " ";
+		}
+	}
+	cout << "\n";
 }
 
 void GrafLista::algorytmKruskala()
@@ -86,6 +90,9 @@ void GrafLista::algorytmKruskala()
 	}
 	cout << endl << "suma wag:" << endl;
 	cout << tree->sumValues() << endl;
+
+	delete queue;
+	delete tree;
 }
 
 void GrafLista::algorytmPrima()
@@ -130,6 +137,96 @@ void GrafLista::algorytmPrima()
 
 	cout << endl << "suma wag:" << endl;
 	cout << tree->sumValues() << endl;
+
+	delete queue;
+	delete tree;
+}
+
+struct compareNodes {
+	bool operator()(Vertex x, Vertex y)
+	{
+		if (x.value > y.value) return true;
+		return false;
+	}
+};
+
+typedef std::priority_queue <Vertex, std::vector <Vertex>, compareNodes> VertexQueue;
+
+void GrafLista::algorytmDijkstry(int firstVertex, int lastVertex)
+{
+	vector<bool> usedvertices(vertices);
+	vector<int> minimalCost(vertices);
+	vector<int> previousvertices(vertices);
+
+	for (int i = 0; i < vertices; i++) {
+		usedvertices[i] = false;
+		minimalCost[i] = INF;
+		previousvertices[i] = -1;
+	}
+
+	vector<std::list<Edge>> listGraph2(vertices);
+	for (auto iter = list.begin(); iter != list.end(); iter++) {
+		listGraph2[iter->vertex1].push_back(Edge(iter->vertex1, iter->vertex2, iter->value, 0));
+	}
+
+	minimalCost[firstVertex] = 0;
+	vector<Edge> usedEdges;
+	VertexQueue mojaKolejka;
+	Vertex selectedVertex;
+	for (int i = 0; i < vertices; i++) mojaKolejka.push(Vertex(minimalCost[i], i, previousvertices[i]));
+	for (int x = 0; x < vertices; x++) {
+		selectedVertex = mojaKolejka.top();
+		if ((selectedVertex.value == minimalCost[selectedVertex.index]) && selectedVertex.previous == previousvertices[selectedVertex.index]) {
+			if (!usedvertices[selectedVertex.index]) {
+				usedvertices[selectedVertex.index] = true;
+
+				for (std::list<Edge>::iterator iter = listGraph2[selectedVertex.index].begin(); iter != listGraph2[selectedVertex.index].end(); ++iter)
+					usedEdges.insert(usedEdges.begin() + usedEdges.size(), Edge(*iter));
+				for (int i = 0; i < usedEdges.size(); i++) {
+					if (minimalCost[usedEdges[i].vertex2] >(minimalCost[selectedVertex.index] + usedEdges[i].value)) {
+						minimalCost[usedEdges[i].vertex2] = (minimalCost[selectedVertex.index] + usedEdges[i].value);
+						previousvertices[usedEdges[i].vertex2] = selectedVertex.index;
+						mojaKolejka.push(Vertex(minimalCost[usedEdges[i].vertex2], usedEdges[i].vertex2, selectedVertex.index));
+					}
+				}
+				usedEdges.clear();
+			}
+			mojaKolejka.pop();
+
+			if (mojaKolejka.size() > 0)
+				selectedVertex = mojaKolejka.top();
+			else break;
+		}
+		else {
+			mojaKolejka.pop();
+			mojaKolejka.push(Vertex(minimalCost[selectedVertex.index], selectedVertex.index, previousvertices[selectedVertex.index]));
+			x--;
+		}
+	}
+
+	cout << endl << "ALGORYTM DIJKSTRY" << endl;
+	cout << endl << "Najkrotsze sciezki: " << endl;
+	for (int i = 0; i < vertices; i++)
+	{
+		cout << setw(3) << firstVertex << "-" << i << ":";
+		if (minimalCost[i] == 1000000)
+		{
+			cout << setw(3) << "*" << endl;
+		}
+		else
+		{
+			cout << setw(3) << minimalCost[i] << endl;
+		}
+	}
+
+	if (lastVertex>vertices - 1) {
+		cout << endl << "Dany wierzcholek nie istnieje" << endl;
+	}
+	else {
+		cout << endl << "Najkrotsza sciezka pomiedzy wierzcholkiem startowym, a koncowym " << endl << firstVertex << "-"
+			<< lastVertex << ": " << minimalCost[lastVertex] << endl;
+	}
+
 }
 
 void GrafLista::algorytmFordaBellmana(int firstVertex, int lastVertex)
@@ -173,17 +270,18 @@ void GrafLista::algorytmFordaBellmana(int firstVertex, int lastVertex)
 		}
 	}
 
-	cout << endl << "Najkrotsza sciezka pomiedzy wierzcholkiem startowym, a koncowym " << endl << firstVertex << "-"
-		<< lastVertex << ": " << tab[lastVertex] << endl;
+	if (lastVertex>vertices - 1) {
+		cout << endl << "Dany wierzcholek nie istnieje" << endl;
+	}
+	else {
+		cout << endl << "Najkrotsza sciezka pomiedzy wierzcholkiem startowym, a koncowym " << endl << firstVertex << "-"
+			<< lastVertex << ": " << tab[lastVertex] << endl;
+	}
 
 	delete[]tab;
 }
 
 GrafLista::~GrafLista()
 {
-	//for (int i = 0; i < edges; i++)
-	//	delete[] list[i];
 
-	//delete[] lista;
-	//delete[] wagi;
 }
