@@ -64,9 +64,12 @@ void GrafMacierz::showIncidneceMatrix() {
 
 void GrafMacierz::algorytmKruskala() {
 
+	createConnected();
+	clearConnected();
 	Edge edge;
 	Queue *queue = new Queue();
 	Tree *tree = new Tree();
+	bool* visited = new bool[vertices];
 
 	for (int i = 0; i < edges; i++)
 	{
@@ -78,8 +81,9 @@ void GrafMacierz::algorytmKruskala() {
 
 					if (macierz[n][i] == 1) {
 
-						queue->add(Edge(j, n, wagi[i],0));
-						n = vertices;
+							queue->add(Edge(j, n, wagi[i], 0));
+							n = vertices;
+					
 					}
 
 				}
@@ -88,12 +92,18 @@ void GrafMacierz::algorytmKruskala() {
 	}
 
 	cout << endl << "ALGORYTM KRUSKALA" << endl;
+
 	queue->sortHeap();
+	//queue->bubblesort();
 	while (tree->completedTree(vertices) == false)
 	{
+
 		edge = queue->removeEdge();
-		tree->addEdge(edge);
-		cout << edge.vertex1 << "-" << edge.vertex2 << ": " << edge.value << endl;
+		if (canBeAdded(edge)) {
+			addToConnected(edge);
+			tree->addEdge(edge);
+			cout << edge.vertex1 << "-" << edge.vertex2 << ": " << edge.value << endl;
+		}
 	}
 	cout << endl << "suma wag:" << endl;
 	cout << tree->sumValues() << endl;
@@ -134,6 +144,7 @@ void GrafMacierz::algorytmPrima()
 		}
 
 		queue->sortHeap(); //sortuje wedlug danego wierzcholka (i=0) || sortuje krawedzie zebrane dotychcasz
+		queue->bubblesort();
 		edge = queue->removeEdge(); //wybiera najelpsza sciezke
 		tree->addEdge(edge); //dodaje
 		cout << edge.vertex1 << "-" << edge.vertex2 << ": " << edge.value << endl;
@@ -316,6 +327,55 @@ void GrafMacierz::algorytmFordaBellmana(int firstVertex, int lastVertex)
 
 	delete[]tab;
 
+}
+
+void GrafMacierz::createConnected() {
+	for (int i = 0; i < vertices; i++) {
+		connected[i] = new bool[vertices];
+	}
+}
+
+void GrafMacierz::clearConnected() {
+	for (int i = 0; i < vertices; i++) {
+		for (int j = 0; j < vertices; j++) {
+			connected[i][j] = false;
+		}
+	}
+	for (int i = 0; i < vertices; i++) {
+		connected[i][i] = true;
+	}
+}
+
+
+void GrafMacierz::addToConnected(Edge edge) {
+	connected[edge.vertex1][edge.vertex1] = true;
+	for (int i = 0; i < vertices; i++) {
+		if (connected[edge.vertex1][i]) {
+			connected[edge.vertex2][i] = true;
+		}
+		if (connected[edge.vertex2][i]) {
+			connected[edge.vertex1][i] = true;
+		}
+	}
+	for (int i = 0; i < vertices; i++) {
+		for (int j = 0; j < vertices; j++) {
+			if (connected[i][j])
+				for (int k = 0; k < vertices; k++) {
+					if (connected[i][k])
+						connected[j][k] = true;
+				}
+		}
+	}
+
+}
+
+bool GrafMacierz::canBeAdded(Edge edge) {
+	if (connected[edge.vertex1][edge.vertex2])
+		return false;
+	else if (connected[edge.vertex2][edge.vertex1])
+		return false;
+	else
+		return true;
 }
 
 

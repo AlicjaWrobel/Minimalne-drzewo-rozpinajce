@@ -26,6 +26,11 @@ public:
 	void MSTlist(int poczatek, int koniec, int waga); //lista dla MST
 	void SCIEZKAlist(int poczatek, int koniec, int waga); //lista dla sciezki
 	void Show(); //wyswietlenie listy
+	bool canBeAdded(Edge edge);
+	void createConnected();
+	void clearConnected();
+	bool ** connected = new bool *[vertices];
+	void addToConnected(Edge edge);
 
 	void algorytmKruskala();
 	void algorytmPrima();

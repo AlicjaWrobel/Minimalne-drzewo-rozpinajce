@@ -20,6 +20,10 @@ public:
 	void addAppeared(Edge edge); // dodaje krawedz do listy wystapien
 	void sortHeap(); //przywracania wlasnosci kopca min
 	Edge removeEdge(); //usuwa element
+	void uporz¹dkujKopiecGora(int indeks);
+	void uporz¹dkujKopiecDol(int indeks);
+
+	void bubblesort();
 
 	void addVertex(Vertex vertex); //dodaje wiercholek
 	bool add(Vertex vertex); //dodaje wiercholek po sprawdzeniu czy wystapil
