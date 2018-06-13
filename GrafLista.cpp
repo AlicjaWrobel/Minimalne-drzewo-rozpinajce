@@ -62,6 +62,8 @@ void GrafLista::Show()
 
 void GrafLista::algorytmKruskala()
 {
+	createConnected();
+	clearConnected();
 	Edge edge;
 	Queue *queue = new Queue();
 	Tree *tree = new Tree();
